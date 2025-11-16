@@ -1,0 +1,11 @@
+date,product,category,price,quantity,total_revenue,high_value,unit_price_flag,category_rank
+2024-01-01,Keyboard,Electronics,1200,3,3600,normal,premium,1
+2024-01-01,Mouse,Electronics,600,5,3000,normal,standard,1
+2024-01-02,Coffee,Food,200,10,2000,normal,standard,3
+2024-01-03,Monitor,Electronics,15000,1,15000,high,premium,1
+2024-01-03,Notebook,Stationery,50,30,1500,normal,standard,4
+2024-01-04,Pen,Stationery,20,100,2000,normal,standard,4
+2024-01-05,USB Cable,Electronics,300,15,4500,normal,standard,1
+2024-01-05,Tea,Food,150,20,3000,normal,standard,3
+2024-01-06,Chair,Furniture,5000,2,10000,high,premium,2
+2024-01-06,Table,Furniture,12000,1,12000,high,premium,2
