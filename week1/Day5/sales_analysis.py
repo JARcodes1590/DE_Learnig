@@ -1,32 +1,31 @@
 import pandas as pd
-df=pd.read_csv("/home/raj/Desktop/DE_base/week1/Day5/sales_data.csv")
-print("\nOrginal dataset")
-print(df)
-df["total_revenue"]=df["price"]*df["quantity"]
-print("\nDataFrame with total revenue")
-print(df)
 
-# clean column types
-df["date"]=pd.to_datetime(df["date"])
-print("\nAfter converting date column:")
-print(df.dtypes)
+def load_data(path):
+    df=pd.read_csv(path)
+    df["date"]=pd.to_datetime(df["date"])
+    df["total_revenue"]=df["price"]*df["quantity"]
+    return df
 
-# sorted data frame
-df_sorted=df.sort_values("total_revenue",ascending=False)
-print("\nData sorted by revenue")
-print(df_sorted)
+def analyze_sale(df):
+    category_summary=df.groupby("category")["total_revenue"].sum()
+    daily_summary=df.groupby("date")["total_revenue"].sum()
+    return category_summary,daily_summary
 
-# filtering by category
-electronics=df[df["category"] =="Electronics"]
-print("\nElectronic products:")
-print(electronics)
-
-# grouping very important
-category_summary=df.groupby("category")["total_revenue"].sum()
-print("\nSummary of revenue by category:")
-print(category_summary)
-
-# total revenue by day
-daily_revenue_summary=df.groupby("date")["total_revenue"].sum()
-print("\nSummary of revenue by day")
-print(daily_revenue_summary)
+def saved_cleaned(df,path):
+    df.to_csv(path,index=False)
+    
+if __name__ == "__main__":
+    df=load_data("/home/raj/Desktop/DE_base/week1/Day5/sales_data.csv") 
+    print("\nData with total revenue")
+    print(df)
+    
+    category_summary,daily_summary=analyze_sale(df)
+    
+    print("\nRevenue by category:")
+    print(category_summary)
+    
+    print("\nDaily Revenue")
+    print(daily_summary)
+    
+    saved_cleaned(df,"sales_cleaned.csv")
+    print("\nSaved sales_cleaned.csv")
