@@ -1,0 +1,166 @@
+sudo -iu postgres psql
+
+-- create user and update roles
+CREATE USER raj WITH PASSWORD 'raj123';
+ALTER ROLE raj WITH LOGIN;
+ALTER ROLE raj CREATEDB;
+
+-- creating database
+CREATE DATABASE de_project OWNER raj;
+
+-- logging in to the created user
+psql -U raj -d de_project
+
+-- create table
+CREATE TABLE sales (
+    date            date,
+    product         text,
+    category        text,
+    price           integer,
+    quantity        integer,
+    total_revenue   integer,
+    high_value      text,
+    unit_price_flag text,
+    category_rank   integer
+);
+
+
+-- to check it
+\d sales;
+
+-- import sales_cleaned.csv to sql
+\copy sales(date, product, category, price, quantity, total_revenue, high_value, unit_price_flag, category_rank)
+FROM '/home/raj/Desktop/Programming/DE_base/week1/Project_I/sales_cleaned.csv'
+DELIMITER ',' CSV HEADER;
+
+
+-- if data is inserted or not
+SELECT * FROM SALES;
+
+
+-- to view few lines at at time
+SELECT * FROM sales LIMIT 5;
+
+
+-- total revenue by category:
+SELECT category,
+    SUM(total_revenue) AS revenue
+FROM sales
+GROUP BY category
+ORDER BY revenue DESC;
+
+-- top 3 products by revenue
+SELECT product,
+    SUM(total_revenue) AS revenue
+FROM sales
+GROUP BY product
+ORDER BY revenue DESC
+LIMIT 3;
+
+-- total revenue by day
+SELECT date,
+    SUM(total_revenue) AS revenue
+FROM sales
+GROUP BY date
+ORDER BY revenue DESC;
+
+
+-- practice tasks 1
+SELECT * FROM sales WHERE category = 'Electronics';
+
+
+-- task 2
+SELECT * FROM sales WHERE total_revenue > 5000;
+
+-- task 3 
+SELECT * FROM sales WHERE category = 'Electronics' AND high_value = 'high';
+
+-- task 4
+SELECT * FROM sales WHERE category = 'Food' OR category = 'Stationery';
+
+-- task 5 top 2 food products by total revenue
+SELECT product,total_revenue FROM sales WHERE category = 'Food'
+ORDER BY total_revenue DESC
+LIMIT 2;
+
+-- Task 6: Only show categories with total revenue greater than 10,000:
+SELECT category,SUM(total_revenue) AS revenue
+FROM sales
+GROUP BY category
+HAVING SUM(total_revenue)>10000
+ORDER BY revenue DESC;
+
+-- Concepts like IN,BETWEEN,LIKE
+
+-- IN instead of or
+SELECT * FROM sales WHERE category IN('Food','Stationery');
+
+-- total_revenue between 3000 and 10000 (inclusive):
+SELECT * FROM sales WHERE total_revenue BETWEEN 3000 AND 10000 ORDER BY total_revenue DESC;
+
+-- Or dates between 2024-01-03 and 2024-01-05:
+SELECT date,product,total_revenue FROM sales WHERE date BETWEEN 
+'2024-01-03' AND '2024-01-05' ORDER BY date DESC;
+
+-- LIKE – simple pattern matching
+-- % = any number of characters
+-- _ = exactly one character
+
+-- products starting with 'T'
+SELECT * FROM sales WHERE product LIKE 'T%';
+
+-- products ending with 'e'
+SELECT * FROM sales WHERE product LIKE '%e';
+
+-- products containing 'able'
+SELECT * FROM sales WHERE product LIKE '%able%';
+
+-- Add customer_id to sales
+ALTER TABLE sales
+ADD COLUMN customer_id integer;
+
+-- set customer_id in sales
+UPDATE sales SET customer_id = 1 WHERE product IN ('Keyboard', 'Mouse');
+UPDATE sales SET customer_id = 2 WHERE product IN ('Monitor', 'USB Cable');
+UPDATE sales SET customer_id = 3 WHERE product IN ('Coffee', 'Tea');
+UPDATE sales SET customer_id = 4 WHERE product IN ('Notebook', 'Pen');
+UPDATE sales SET customer_id = 5 WHERE product IN ('Chair', 'Table');
+
+-- Create customer table
+CREATE TABLE customers (
+    id          integer PRIMARY KEY,
+    name        text,
+    region      text
+);
+
+-- JOIN VVIP
+
+-- Inner join between sales and customers table
+SELECT s.date,
+        s.product,
+        s.total_revenue,
+        c.name AS customer_name,
+        c.region
+FROM sales AS s
+JOIN customers AS c
+ON s.customer_id=c.id;
+
+-- total revenue per customer
+SELECT c.name AS customer_name,
+c.region,
+SUM(s.total_revenue) AS revenue
+FROM sales AS s
+JOIN customers AS c
+ON s.customer_id = c.id
+GROUP BY c.name,c.region
+ORDER BY revenue DESC;
+
+-- Total revenue by region (across all customers)
+SELECT c.region,
+SUM(s.total_revenue) AS revenue
+FROM sales AS s
+JOIN customers AS c
+ON s.customer_id = c.id
+GROUP BY c.region
+ORDER BY revenue DESC;
+

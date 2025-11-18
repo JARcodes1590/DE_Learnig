@@ -1,0 +1,28 @@
+-- Top product per region
+SELECT c.region,s.product,
+SUM(s.total_revenue) AS revenue
+FROM sales AS s
+JOIn customers AS c
+ON s.customer_id = c.id
+GROUP BY c.region,s.product
+ORDER BY revenue DESC
+LIMIT 3;
+
+-- Total revenue per day per region
+SELECT c.region,s.date,
+SUM(s.total_revenue) AS revenue
+FROM sales AS s
+JOIn customers AS c
+ON s.customer_id = c.id
+GROUP BY c.region,s.date
+ORDER BY date DESC;
+
+-- Which customer in each region spends the most? (window functions later 👀)
+SELECT c.name AS customer_name,
+SUM(s.total_revenue) AS revenue
+FROM sales AS s
+JOIN customers AS c
+ON s.customer_id = c.id
+GROUP BY c.name
+ORDER BY revenue DESC
+LIMIT 1;
