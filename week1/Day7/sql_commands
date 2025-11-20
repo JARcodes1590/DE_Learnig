@@ -1,0 +1,29 @@
+-- Add a rank per region using a window function
+SELECT
+c.region,c.name AS customer_name,
+SUM(s.total_revenue) AS revenue,
+ROW_NUMBER() OVER(
+    PARTITION BY c.region
+    ORDER BY SUM(s.total_revenue)DESC
+) AS region_rank
+FROM sales AS s 
+JOIN customers AS c
+ON s.customer_id=c.id
+GROUP BY c.region,c.name
+ORDER BY C.region,region_rank;
+
+-- Get top 2 customers per region
+SELECT * FROM(SELECT c.region,
+c.name AS customer_name,
+SUM(s.total_revenue) AS revenue,
+ROW_NUMBER() OVER (
+    PARTITION BY c.region
+    ORDER BY SUM(s.total_revenue) DESC
+) AS region_rank
+FROM sales AS s
+JOIN customers AS c 
+ON s.customer_id=c.id
+GROUP BY c.region,c.name
+) AS ranked
+WHERE region_rank<=2
+ORDER BY region,region_rank;
